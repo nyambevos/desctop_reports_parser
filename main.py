@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 
-from gui import MainWindow
+from gui import RootWindow
 
-root = MainWindow(title="Parser")
+root = RootWindow(title="Parser")
 
 
 if __name__ == "__main__":

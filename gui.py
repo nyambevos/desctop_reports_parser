@@ -5,7 +5,7 @@ from tkinter import *
 SETTING_FILE = "setting.conf"
 
 
-class MainWindow(Tk):
+class RootWindow(Tk):
     def __init__(
             self,
             title: str = "Main window",
@@ -85,5 +85,4 @@ class MainWindow(Tk):
     def __show_point_xy(self):
         self.show_label['text'] = f'x: {self.winfo_x()}, y: {self.winfo_y()}, width: {self.winfo_width()}, height: {self.winfo_height()}'
         self.after(100, self.__show_point_xy)
-
 
