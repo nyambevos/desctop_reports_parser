@@ -1,6 +1,7 @@
 import pickle
 from pathlib import Path
 from tkinter import *
+from tkinter import ttk
 
 SETTING_FILE = "setting.conf"
 
@@ -32,10 +33,7 @@ class RootWindow(Tk):
 
         self.protocol("WM_DELETE_WINDOW", self.__on_closing)
 
-        self.show_label = Label(self, text="")
-        self.show_label.pack()
 
-        self.after(100, self.__show_point_xy)
     
     def __save_setting(self) -> None:
         setting = {
@@ -50,6 +48,8 @@ class RootWindow(Tk):
 
     def __load_setting(self) -> dict:
         self.attributes("-topmost", True)
+
+        
 
         if Path(SETTING_FILE).exists():
             with open(SETTING_FILE, "br") as file:
@@ -82,7 +82,45 @@ class RootWindow(Tk):
         self.__save_setting()
         self.destroy()
 
-    def __show_point_xy(self):
-        self.show_label['text'] = f'x: {self.winfo_x()}, y: {self.winfo_y()}, width: {self.winfo_width()}, height: {self.winfo_height()}'
-        self.after(100, self.__show_point_xy)
 
+class ParserApp(RootWindow):
+    def __init__(self,
+                 title: str = "Parser",
+                 screenName: str | None = None,
+                 baseName: str | None = None,
+                 className: str = "Tkk",
+                 useTk: bool = True,
+                 sync: bool = False,
+                 use: str | None = None
+                 ) -> None:
+
+        super().__init__(title,
+                         screenName,
+                         baseName,
+                         className,
+                         useTk,
+                         sync,
+                         use)
+        
+
+        style = ttk.Style()
+        style.configure("Main.TFrame", background="red")
+        style.configure("Panel.TFrame", background="green")
+        style.configure("LogText.TFrame", background="grey")
+        
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.mainFrame = ttk.Frame(self, padding=(5,5,5,5), style="Main.TFrame")
+        self.mainFrame.grid(column=0, row=0, sticky=(N, S, E, W))
+
+        self.mainFrame.grid_rowconfigure(1, weight=1)
+        self.mainFrame.grid_columnconfigure(0, weight=1)
+
+        self.panel = ttk.Frame(self.mainFrame, height=50, width=-1, style="Panel.TFrame")
+        self.panel.grid(column=0, row=0, sticky=(E, W))
+        
+        
+        self.logText = ttk.Frame(self.mainFrame, height=50, style="LogText.TFrame")
+        self.logText.grid(column=0, row=2, sticky=(E, W))
+        
