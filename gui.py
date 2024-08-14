@@ -1,7 +1,8 @@
+from typing import Literal, Callable
 import pickle
 from pathlib import Path
 from tkinter import *
-from tkinter import ttk
+from tkinter import Misc, ttk
 
 SETTING_FILE = "setting.conf"
 
@@ -104,6 +105,7 @@ class ParserApp(RootWindow):
         
 
         style = ttk.Style()
+        # style.theme_use('alt')
         style.configure("Main.TFrame", background="red")
         style.configure("Panel.TFrame", background="green")
         style.configure("LogText.TFrame", background="grey")
@@ -116,11 +118,85 @@ class ParserApp(RootWindow):
 
         self.mainFrame.grid_rowconfigure(1, weight=1)
         self.mainFrame.grid_columnconfigure(0, weight=1)
+        
+        self.logTextPanel = LogTextPanel(self.mainFrame, height=120)
+        self.logTextPanel.grid(column=0, row=2, sticky=(E, W))
 
-        self.panel = ttk.Frame(self.mainFrame, height=50, width=-1, style="Panel.TFrame")
-        self.panel.grid(column=0, row=0, sticky=(E, W))
+        self.buttomPanel = ButtomPanel(self.mainFrame, output_frame=self.logTextPanel, style="Panel.TFrame")
+        self.buttomPanel.grid(column=0, row=0, sticky=(E, W))
+
+
+class LogTextPanel(ttk.Frame):
+    def __init__(
+            self,
+            master: Misc | None = None,
+            *,
+            border: str | float = "",
+            borderwidth: str | float = "",
+            class_: str = "",
+            cursor: str | tuple[str] | tuple[str, str] | tuple[str, str, str] | tuple[str, str, str, str] = "",
+            height: str | float = 0,
+            name: str = "",
+            padding: str | float | tuple[str | float] | tuple[str | float, str | float] | tuple[str | float, str | float, str | float] | tuple[str | float, str | float, str | float, str | float] = "",
+            relief: Literal['raised'] | Literal['sunken'] | Literal['flat'] | Literal['ridge'] | Literal['solid'] | Literal['groove'] = 'flat',
+            style: str = "",
+            takefocus: bool | Callable[[str], bool | None] | Literal[0] | Literal[1] | Literal[''] = "",
+            width: str | float = 0
+            ) -> None:
+        super().__init__(
+            master,
+            border=border,
+            borderwidth=borderwidth,
+            class_=class_,
+            cursor=cursor,
+            height=height,
+            name=name,
+            padding=padding,
+            relief=relief,
+            style=style,
+            takefocus=takefocus,
+            width=width
+            )
+        self.grid_propagate(False)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.logText = Text(self, highlightthickness=1, highlightcolor='gray', wrap="word", borderwidth=5)
+        self.logText.grid(column=0, row=0, sticky=(E, W))
+
+        self.scrollbar = ttk.Scrollbar(self, orient=VERTICAL, command=self.logText.yview)
+        self.scrollbar.grid(column=1, row=0, sticky=(N,S))
+        self.logText['yscrollcommand'] = self.scrollbar.set
+
         
-        
-        self.logText = ttk.Frame(self.mainFrame, height=50, style="LogText.TFrame")
-        self.logText.grid(column=0, row=2, sticky=(E, W))
-        
+    
+    def print(self, string: str) -> None:
+        self.logText.config(state="normal")
+        self.logText.insert("end", string)
+        self.logText.config(state="disabled")
+        self.logText.see("end")
+
+
+class ButtomPanel(ttk.Frame):
+    def __init__(
+            self,
+            master: Misc | None = None,
+            output_frame: LogTextPanel = None,
+            *args,
+            **kwargs
+            ) -> None:
+        super().__init__(
+            master,
+            *args,
+            **kwargs
+            )
+        self.output_frame = output_frame
+
+        self.grid_rowconfigure(9, weight=1)
+        self.grid_columnconfigure(9, weight=1)
+
+        self.accountButton = ttk.Button(self, text="Google", width=5, command=self.print_log)
+        self.accountButton.grid(column=10, row=0)
+
+    def print_log(self):
+        self.output_frame.print("Test working the buttom\n")
